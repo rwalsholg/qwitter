@@ -125,6 +125,10 @@
 
 <script>
 export default {
+  // Open/closed state of the two drawers. Both start closed, but because each
+  // q-drawer has show-if-above they are still shown on wide screens - these
+  // flags only really take effect on small screens, where the toolbar's menu
+  // button toggles "left" and the trends drawer stays hidden.
   data () {
     return {
       left: false,
