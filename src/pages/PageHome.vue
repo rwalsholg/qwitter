@@ -131,6 +131,9 @@ export default {
     }
   },
   methods: {
+    // Writes the composed qweet to Firestore and clears the input.
+    // The local "qweets" array is not touched here - the onSnapshot
+    // listener in mounted() receives the "added" change and prepends it.
     addNewQweet() {
       let newQweet = {
         content: this.newQweetContent,
@@ -145,6 +148,8 @@ export default {
       })
       this.newQweetContent = ''
     },
+    // Deletes the qweet's document by its Firestore id. Removal from the
+    // list happens in the "removed" branch of the onSnapshot listener.
     deleteQweet(qweet) {
       db.collection('qweets').doc(qweet.id).delete().then(function() {
         console.log('Document successfully deleted!');
@@ -152,6 +157,8 @@ export default {
         console.error('Error removing document: ', error);
       })
     },
+    // Flips the "liked" flag of a single qweet in Firestore. Only that one
+    // field is sent, so update() leaves content and date untouched.
     toggleLiked(qweet) {
       db.collection('qweets').doc(qweet.id).update({
         liked: !qweet.liked
@@ -166,10 +173,17 @@ export default {
     }
   },
   filters: {
+    // Turns the stored Date.now() timestamp into wording like
+    // "about 2 hours" for the qweet header. Note it is not reactive:
+    // the text only refreshes when the qweet itself re-renders.
     relativeDate(value) {
       return formatDistance(value, new Date())
     }
   },
+  // Opens the realtime listener for the timeline, oldest document first.
+  // Only the changed documents come through, so each change type is applied
+  // to the local array by hand: unshift puts the newest qweet on top, while
+  // "modified" and "removed" are matched back to their entry by id.
   mounted() {
     db.collection('qweets').orderBy('date').onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
