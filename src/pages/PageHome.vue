@@ -111,6 +111,10 @@ import { formatDistance } from 'date-fns'
 
 export default {
   name: 'PageHome',
+  // Local component state. "newQweetContent" is bound to the composer
+  // q-input (v-model, 280-char max) and cleared by addNewQweet().
+  // "qweets" starts empty on purpose: it is filled and kept in sync
+  // entirely by the Firestore onSnapshot listener set up in mounted().
   data() {
     return {
       newQweetContent: '',
